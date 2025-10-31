@@ -83,6 +83,8 @@ pub fn decode(s: &str) -> Result<Vec<u8>, Base45Error> {
     }
     if i < bytes.len() {
         if i + 1 >= bytes.len() {
+            // Single trailing character: report InvalidChar if it's not in alphabet, otherwise Dangling
+            if b45_val(bytes[i]).is_none() { return Err(Base45Error::InvalidChar); }
             return Err(Base45Error::Dangling);
         }
         let c0 = b45_val(bytes[i]).ok_or(Base45Error::InvalidChar)? as u32;
@@ -119,6 +121,14 @@ mod tests {
 
     #[test]
     fn known_vectors() {
+        // Base45 uses least-significant digit first (lsd-first): output order is c, b, a.
+        // For a 2-byte group [u, v], form x = u*256 + v, then:
+        // c = x % 45; x /= 45; b = x % 45; a = x / 45; and output chars are [c, b, a].
+        // For a 1-byte group [u], b = u % 45; a = u / 45; and output chars are [b, a].
+        // Edge cases at boundaries
+        // [0x00, 0x00] -> x = 0; digits: c=0, b=0, a=0; output lsd-first -> "000"
+        assert_eq!(encode(&[0x00, 0x00]), "000");
+
         // From RFC examples and common vectors
         assert_eq!(encode(b"AB"), "BB8");
         assert_eq!(encode(b"Hello!!"), "%69 VD92EX0");
@@ -131,7 +141,20 @@ mod tests {
 
     #[test]
     fn errors() {
-        assert!(matches!(decode("A"), Err(Base45Error::Dangling)));
-        assert!(matches!(decode("😀"), Err(Base45Error::InvalidChar)));
+        // Error categories under test:
+        // - InvalidChar: character not in RFC 9285 alphabet
+        // - Dangling: incomplete group (e.g., single trailing valid character)
+        // - Overflow: numeric value exceeds maximum for the group
+        // Invalid characters and structural errors
+        assert!(matches!(decode("\t"), Err(Base45Error::InvalidChar))); // '\t' not in Base45 alphabet
+        assert!(matches!(decode("\n"), Err(Base45Error::InvalidChar))); // '\n' not in Base45 alphabet
+        // Overflow cases
+        // 3-char group with max digits -> value > 65535
+        assert!(matches!(decode(":::"), Err(Base45Error::Overflow))); // ':::' -> 44*45^2 + 44*45 + 44 = 91124 > 65535
+        // 2-char group producing >255
+        assert!(matches!(decode("ZZ"), Err(Base45Error::Overflow))); // 'ZZ' -> 35*45 + 35 = 1610 > 255
+
+        assert!(matches!(decode("A"), Err(Base45Error::Dangling))); // single valid char -> incomplete group
+        assert!(matches!(decode("😀"), Err(Base45Error::InvalidChar))); // not in Base45 alphabet
     }
 }
