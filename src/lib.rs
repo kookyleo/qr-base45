@@ -45,7 +45,7 @@ pub fn encode(input: &[u8]) -> String {
         let x = x / 45;
         let b = x % 45;
         let a = x / 45; // most significant digit (0..=8)
-                        // Base45 outputs least-significant digit first
+        // Base45 outputs least-significant digit first
         out.push(BASE45_ALPHABET[c as usize] as char);
         out.push(BASE45_ALPHABET[b as usize] as char);
         out.push(BASE45_ALPHABET[a as usize] as char);
@@ -84,7 +84,9 @@ pub fn decode(s: &str) -> Result<Vec<u8>, Base45Error> {
     if i < bytes.len() {
         if i + 1 >= bytes.len() {
             // Single trailing character: report InvalidChar if it's not in alphabet, otherwise Dangling
-            if b45_val(bytes[i]).is_none() { return Err(Base45Error::InvalidChar); }
+            if b45_val(bytes[i]).is_none() {
+                return Err(Base45Error::InvalidChar);
+            }
             return Err(Base45Error::Dangling);
         }
         let c0 = b45_val(bytes[i]).ok_or(Base45Error::InvalidChar)? as u32;

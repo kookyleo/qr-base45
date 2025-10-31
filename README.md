@@ -25,6 +25,7 @@ assert_eq!(back, data);
 ```
 
 ## Notes
+- MSRV: 1.85+ (Rust 2024 edition requirement)
 - This crate intentionally encodes/decodes arbitrary bytes, not UTF-8 text. If you have a text string, pass its bytes explicitly.
 - Errors include invalid characters, dangling final character, and value overflow per RFC rules.
 

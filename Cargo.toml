@@ -2,6 +2,7 @@
 name = "qr-base45"
 version = "0.1.1"
 edition = "2024"
+rust-version = "1.85"
 authors = ["kookyleo <kookyleo@gmail.com>"]
 description = "Base45 encode/decode for arbitrary bytes per RFC 9285 (QR alphanumeric alphabet)"
 license = "Apache-2.0"
