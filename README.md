@@ -1,5 +1,8 @@
 # qr-base45
 
+[![Crates.io](https://img.shields.io/crates/v/qr-base45.svg)](https://crates.io/crates/qr-base45)
+[![Docs.rs](https://docs.rs/qr-base45/badge.svg)](https://docs.rs/qr-base45)
+
 Base45 encode/decode for arbitrary bytes per RFC 9285 (QR alphanumeric alphabet).
 
 - 2 bytes -> 3 chars; 1 byte -> 2 chars
