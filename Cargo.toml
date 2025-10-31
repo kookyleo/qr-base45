@@ -1,0 +1,19 @@
+[package]
+name = "qr-base45"
+version = "0.1.1"
+edition = "2024"
+authors = ["kookyleo <kookyleo@gmail.com>"]
+description = "Base45 encode/decode for arbitrary bytes per RFC 9285 (QR alphanumeric alphabet)"
+license = "Apache-2.0"
+repository = "https://github.com/kookyleo/qr-base45"
+readme = "README.md"
+keywords = ["base45", "qr", "rfc9285", "encoding"]
+categories = ["encoding", "no-std"]
+
+[dependencies]
+thiserror = "1"
+
+[features]
+# Optional no_std support without alloc is difficult since String/Vec are required.
+# We keep std by default and allow "alloc" only builds if needed later.
+default = []
